@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebScan — Akıllı Web Tarama</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════ TITLEBAR DRAG AREA ═══════════════ -->
+    <div class="titlebar-drag"></div>
+
+    <!-- ═══════════════ HEADER / SEARCH BAR ═══════════════ -->
+    <header class="header" id="header">
+        <div class="header-brand">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6366f1" />
+                            <stop offset="100%" style="stop-color:#a855f7" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+            </div>
+            <h1 class="brand-name">Web<span>Scan</span></h1>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" id="keywordInput" class="search-input"
+                    placeholder="Anahtar kelime(ler) girin... (virgülle ayırın: staj, yazılım)" autocomplete="off">
+            </div>
+            <button id="scanBtn" class="btn btn-scan">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                <span>Tara</span>
+            </button>
+            <button id="stopBtn" class="btn btn-stop hidden">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                </svg>
+                <span>Durdur</span>
+            </button>
+        </div>
+
+        <div class="header-stats" id="headerStats">
+            <div class="stat-chip">
+                <svg class="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+                <span class="stat-value" id="siteCount">0</span>
+                <span class="stat-label">Site</span>
+            </div>
+            <div class="stat-chip">
+                <svg class="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                <span class="stat-value" id="resultCount">0</span>
+                <span class="stat-label">Sonuç</span>
+            </div>
+            <!-- Ayarlar Butonu -->
+            <button class="btn-settings" id="settingsBtn" title="Ayarlar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <main class="main-layout">
+
+        <!-- ─────── SOL PANEL: SİTELER ─────── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="panel-header">
+                <h2 class="panel-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                    </svg>
+                    <span class="sidebar-label">Siteler</span>
+                </h2>
+                <button class="btn-sidebar-toggle" id="sidebarToggle" title="Paneli daralt/genişlet">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <line x1="9" y1="3" x2="9" y2="21" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Site Ekleme Formu -->
+            <div class="sidebar-content" id="sidebarContent">
+                <div class="add-site-form">
+                    <input type="text" id="siteUrlInput" class="input" placeholder="https://www.example.com">
+                    <input type="text" id="siteNameInput" class="input" placeholder="Site adı (opsiyonel)">
+                    <select id="siteCategorySelect" class="input select">
+                        <option value="is">İş & Kariyer</option>
+                        <option value="eticaret">E-Ticaret</option>
+                        <option value="haber">Haber</option>
+                        <option value="egitim">Eğitim</option>
+                        <option value="diger">Diğer</option>
+                    </select>
+                    <button id="addSiteBtn" class="btn btn-add">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        <span>Site Ekle</span>
+                    </button>
+                </div>
+
+                <!-- Hızlı Ekleme -->
+                <div class="quick-add">
+                    <p class="quick-add-label">Hızlı Ekle:</p>
+                    <div class="quick-add-buttons">
+                        <button class="btn btn-quick" data-url="https://www.kariyer.net" data-name="Kariyer.net"
+                            data-category="is">Kariyer.net</button>
+                        <button class="btn btn-quick" data-url="https://www.linkedin.com/jobs" data-name="LinkedIn Jobs"
+                            data-category="is">LinkedIn</button>
+                        <button class="btn btn-quick" data-url="https://www.indeed.com" data-name="Indeed"
+                            data-category="is">Indeed</button>
+                        <button class="btn btn-quick" data-url="https://www.glassdoor.com" data-name="Glassdoor"
+                            data-category="is">Glassdoor</button>
+                        <button class="btn btn-quick" data-url="https://www.hepsiburada.com" data-name="Hepsiburada"
+                            data-category="eticaret">Hepsiburada</button>
+                        <button class="btn btn-quick" data-url="https://www.trendyol.com" data-name="Trendyol"
+                            data-category="eticaret">Trendyol</button>
+                    </div>
+                </div>
+
+                <!-- Site Listesi -->
+                <div class="site-list" id="siteList">
+                    <div class="empty-state" id="emptySites">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" opacity="0.3">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                        <p>Henüz site eklenmedi</p>
+                        <span>Yukarıdaki formdan veya hızlı ekleme butonlarından site ekleyin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ─────── ANA İÇERİK: SONUÇLAR ─────── -->
+        <section class="content" id="content">
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <button class="tab active" data-tab="results" id="tabResults">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    Sonuçlar
+                </button>
+                <button class="tab" data-tab="favorites" id="tabFavorites">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    Favoriler
+                </button>
+                <button class="tab" data-tab="history" id="tabHistory">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    Geçmiş
+                </button>
+            </div>
+
+            <!-- Sonuçlar Paneli -->
+            <div class="tab-content active" id="resultsPanel">
+                <div class="welcome-state" id="welcomeState">
+                    <div class="welcome-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="url(#grad2)"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <defs>
+                                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#6366f1" />
+                                    <stop offset="100%" style="stop-color:#a855f7" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            <line x1="11" y1="8" x2="11" y2="14" />
+                            <line x1="8" y1="11" x2="14" y2="11" />
+                        </svg>
+                    </div>
+                    <h2>WebScan'a Hoşgeldiniz!</h2>
+                    <p>Sol panelden site ekleyin, anahtar kelime girin ve taramayı başlatın.<br>Birden fazla kelime için
+                        virgül kullanın: <strong>staj, yazılım, intern</strong></p>
+                    <div class="welcome-steps">
+                        <div class="step"><span class="step-num">1</span><span>Site ekleyin</span></div>
+                        <div class="step"><span class="step-num">2</span><span>Kelime(ler) girin</span></div>
+                        <div class="step"><span class="step-num">3</span><span>Tara butonuna tıklayın</span></div>
+                    </div>
+                </div>
+
+                <!-- Filtre Toolbar -->
+                <div class="filter-toolbar hidden" id="filterToolbar">
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                            </svg>
+                            Filtrele
+                        </label>
+                        <select id="filterSite" class="filter-select">
+                            <option value="all">Tüm Siteler</option>
+                        </select>
+                        <select id="filterCategory" class="filter-select">
+                            <option value="all">Tüm Kategoriler</option>
+                            <option value="is">İş & Kariyer</option>
+                            <option value="eticaret">E-Ticaret</option>
+                            <option value="haber">Haber</option>
+                            <option value="egitim">Eğitim</option>
+                            <option value="diger">Diğer</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <polyline points="19 12 12 19 5 12" />
+                            </svg>
+                            Sırala
+                        </label>
+                        <select id="sortBy" class="filter-select">
+                            <option value="score-desc">Skor: Yüksek → Düşük</option>
+                            <option value="score-asc">Skor: Düşük → Yüksek</option>
+                            <option value="title-asc">Başlık: A → Z</option>
+                            <option value="title-desc">Başlık: Z → A</option>
+                        </select>
+                    </div>
+                    <span class="filter-count" id="filterCount"></span>
+                </div>
+
+                <!-- Tarama İlerleme -->
+                <div class="scan-progress hidden" id="scanProgress">
+                    <div class="progress-header">
+                        <div class="progress-spinner"></div>
+                        <span class="progress-text" id="progressText">Tarama başlatılıyor...</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                    <p class="progress-detail" id="progressDetail"></p>
+                </div>
+
+                <!-- Sonuç Kartları Grid -->
+                <div class="results-grid hidden" id="resultsGrid"></div>
+            </div>
+
+            <!-- Favoriler Paneli -->
+            <div class="tab-content" id="favoritesPanel">
+                <div class="results-grid" id="favoritesGrid">
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" opacity="0.3">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                        <p>Henüz favori eklenmedi</p>
+                        <span>Sonuç kartlarındaki yıldız ikonuna tıklayarak favorilerinize ekleyin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Geçmiş Paneli -->
+            <div class="tab-content" id="historyPanel">
+                <div class="history-list" id="historyList">
+                    <div class="empty-state">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" opacity="0.3">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <p>Henüz tarama yapılmadı</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─────── SAĞ PANEL: SONUÇ DETAYLARI ─────── -->
+        <aside class="detail-panel" id="detailPanel">
+            <div class="detail-header">
+                <h3 class="detail-title-label">Sonuç Detayı</h3>
+                <button class="btn-icon" id="detailClose" title="Kapat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="detail-body" id="detailBody">
+                <!-- Detay içeriği JS ile doldurulur -->
+            </div>
+        </aside>
+    </main>
+
+    <!-- ═══════════════ AYARLAR MODALI ═══════════════ -->
+    <div class="modal-overlay hidden" id="settingsOverlay">
+        <div class="modal" id="settingsModal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    Ayarlar
+                </h2>
+                <button class="btn-icon" id="settingsClose">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Tarama Ayarları -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Tarama Motoru</h3>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingTimeout">Sayfa Yükleme Timeout (ms)</label>
+                        <input type="number" id="settingTimeout" class="input settings-input" value="30000" min="5000"
+                            max="120000" step="1000">
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingDelay">Siteler Arası Bekleme (ms)</label>
+                        <input type="number" id="settingDelay" class="input settings-input" value="1500" min="500"
+                            max="10000" step="500">
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingUserAgent">User-Agent</label>
+                        <input type="text" id="settingUserAgent" class="input"
+                            value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/145.0.0.0 Safari/537.36"
+                            placeholder="User-Agent string">
+                    </div>
+                </div>
+
+                <!-- Chrome Ayarları -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Chrome Tarayıcı</h3>
+                    <div class="settings-row">
+                        <label class="settings-label">Headless Mod</label>
+                        <div class="toggle-wrapper">
+                            <input type="checkbox" id="settingHeadless" checked>
+                            <label class="toggle" for="settingHeadless"></label>
+                            <span class="toggle-text" id="headlessText">Açık (arka planda çalışır)</span>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingProxy">Proxy (opsiyonel)</label>
+                        <input type="text" id="settingProxy" class="input"
+                            placeholder="http://host:port veya socks5://host:port">
+                    </div>
+                </div>
+
+                <!-- Deep Crawl Ayarları -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Deep Crawl (Derin Tarama)</h3>
+                    <div class="settings-row">
+                        <label class="settings-label">Derin Tarama Aktif</label>
+                        <div class="toggle-wrapper">
+                            <input type="checkbox" id="settingDeepCrawl">
+                            <label class="toggle" for="settingDeepCrawl"></label>
+                            <span class="toggle-text" id="deepCrawlText">Kapalı (sadece ana sayfa)</span>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingMaxPages">Maksimum Sayfa (site başına)</label>
+                        <input type="number" id="settingMaxPages" class="input settings-input" value="10" min="1"
+                            max="50" step="1">
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingCrawlDepth">Tarama Derinliği</label>
+                        <input type="number" id="settingCrawlDepth" class="input settings-input" value="2" min="1"
+                            max="5" step="1">
+                    </div>
+                </div>
+
+                <!-- Genel Ayarlar -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Genel</h3>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingMaxResults">Maks. Sonuç (site başına)</label>
+                        <input type="number" id="settingMaxResults" class="input settings-input" value="50" min="10"
+                            max="200" step="10">
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label" for="settingLanguage">Arayüz Dili</label>
+                        <select id="settingLanguage" class="input select">
+                            <option value="tr" selected>Türkçe</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-add" id="settingsSave" style="width:auto; padding:10px 28px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Kaydet</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TOAST ALANI ═══════════════ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "webscan",
+  "version": "1.0.0",
+  "description": "Akıllı Web Tarama ve İzleme Uygulaması - Selenium ile çoklu site tarama",
+  "main": "main.js",
+  "scripts": {
+    "start": "start.bat"
+  },
+  "keywords": [
+    "electron",
+    "selenium",
+    "web-scraping",
+    "price-comparison"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "nedb-promises": "^6.2.3",
+    "selenium-webdriver": "^4.16.0"
+  },
+  "devDependencies": {
+    "electron": "^40.6.0"
+  }
+}
