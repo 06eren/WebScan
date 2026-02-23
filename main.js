@@ -4,6 +4,7 @@
 
 const { app, BrowserWindow, ipcMain, shell, Notification } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const Database = require('./src/database/db');
 const ScanEngine = require('./src/scraper/engine');
 
@@ -26,6 +27,7 @@ function createWindow() {
             symbolColor: '#8b5cf6',
             height: 36
         },
+        icon: path.join(__dirname, 'Uygulamaİkon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -64,8 +66,16 @@ if (!gotTheLock) {
     // ==================== UYGULAMA YAŞAM DÖNGÜSÜ ====================
 
     app.whenReady().then(() => {
-        // Veritabanını başlat
-        const dataDir = path.join(__dirname, 'data');
+        // Veritabanı dizinini ayarla (Paketlenmiş uygulamada userData'yı kullan)
+        const dataDir = app.isPackaged
+            ? path.join(app.getPath('userData'), 'data')
+            : path.join(__dirname, 'data');
+
+        // Klasör yoksa oluştur
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
+        }
+
         db = new Database(dataDir);
 
         // Tarama motorunu oluştur

@@ -6,6 +6,8 @@
 
 const { Builder, By, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
+const path = require('path');
+const fs = require('fs');
 const Parser = require('./parser');
 const { sleep } = require('../utils/helpers');
 
@@ -27,6 +29,37 @@ class ScanEngine {
             maxPages: 10,
             crawlDepth: 2
         };
+
+        // ===== ASAR PATH FIX =====
+        this.fixSeleniumPath();
+    }
+
+    /**
+     * Selenium Manager yolunu paketlenmiş uygulama için düzeltir
+     */
+    fixSeleniumPath() {
+        try {
+            // selenium-manager binary yolunu bul
+            let managerPath = path.join(
+                __dirname,
+                '../../node_modules/selenium-webdriver/bin/windows/selenium-manager.exe'
+            );
+
+            // Eğer uygulama paketlenmişse (asar içindeyse), yolu .unpacked klasörüne yönlendir
+            if (managerPath.includes('app.asar')) {
+                managerPath = managerPath.replace('app.asar', 'app.asar.unpacked');
+
+                // Yolun doğruluğunu kontrol et
+                if (fs.existsSync(managerPath)) {
+                    process.env.SE_MANAGER_PATH = managerPath;
+                    console.log('Selenium Manager yolu düzeltildi:', managerPath);
+                } else {
+                    console.warn('Uyarı: Unpacked Selenium Manager bulunamadı:', managerPath);
+                }
+            }
+        } catch (err) {
+            console.error('Selenium yol düzeltme hatası:', err);
+        }
     }
 
     /**

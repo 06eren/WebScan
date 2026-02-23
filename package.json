@@ -1,10 +1,44 @@
 {
   "name": "webscan",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Akıllı Web Tarama ve İzleme Uygulaması - Selenium ile çoklu site tarama",
   "main": "main.js",
   "scripts": {
-    "start": "start.bat"
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.06eren.webscan",
+    "productName": "WebScan",
+    "copyright": "Copyright © 2026 Eren",
+    "directories": {
+      "output": "dist"
+    },
+    "asarUnpack": [
+      "node_modules/selenium-webdriver/bin/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "asInvoker",
+      "icon": "Uygulamaİkon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "WebScan"
+    },
+    "files": [
+      "**/*",
+      "!data/*.db",
+      "!.git/**/*",
+      "!.gemini/**/*",
+      "!dist/**/*",
+      "!start.bat",
+      "!check.js"
+    ]
   },
   "keywords": [
     "electron",
@@ -19,6 +53,7 @@
     "selenium-webdriver": "^4.16.0"
   },
   "devDependencies": {
-    "electron": "^40.6.0"
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.1"
   }
 }
