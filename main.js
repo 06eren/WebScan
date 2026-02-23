@@ -27,7 +27,7 @@ function createWindow() {
             symbolColor: '#8b5cf6',
             height: 36
         },
-        icon: path.join(__dirname, 'Uygulamaİkon.png'),
+        icon: path.join(__dirname, 'Uygulamaİkon-Photoroom.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,

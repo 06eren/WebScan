@@ -1,6 +1,6 @@
 {
   "name": "webscan",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Akıllı Web Tarama ve İzleme Uygulaması - Selenium ile çoklu site tarama",
   "main": "main.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "win": {
       "target": "nsis",
       "requestedExecutionLevel": "asInvoker",
-      "icon": "Uygulamaİkon.png"
+      "icon": "Uygulamaİkon-Photoroom.png"
     },
     "nsis": {
       "oneClick": false,

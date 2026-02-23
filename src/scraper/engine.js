@@ -4,7 +4,7 @@
  * Deep Crawl: alt sayfalara girerek tarama
  */
 
-const { Builder, By, until } = require('selenium-webdriver');
+const { Builder, By, until, Key } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const path = require('path');
 const fs = require('fs');
@@ -194,14 +194,124 @@ class ScanEngine {
             await this.driver.get(url);
             await this.driver.wait(until.elementLocated(By.css('body')), 10000);
             await sleep(2000);
-            await this.scrollPage();
 
+            // Akıllı arama dene
+            let results = [];
+            const searchPerformed = await this.performSmartSearch(keyword);
+
+            if (searchPerformed) {
+                this.emitProgress({
+                    type: 'info',
+                    message: `Sitede otomatik arama yapıldı: ${keyword}`
+                });
+                await sleep(3000);
+            }
+
+            // Sayfayı kaydır ve ilk sonuçları al
+            await this.scrollPage();
             const pageSource = await this.driver.getPageSource();
-            return Parser.parse(pageSource, keyword, url);
+            const firstPageResults = Parser.parse(pageSource, keyword, url);
+            results.push(...firstPageResults);
+
+            // Sayfalandırma yap (Eğer akıllı arama yapıldıysa daha fazla sonuç ara)
+            if (searchPerformed) {
+                const moreResults = await this.handlePagination(keyword, url);
+                results.push(...moreResults);
+            }
+
+            return results;
         } catch (error) {
             console.error(`Sayfa yüklenemedi (${url}):`, error.message);
             throw error;
         }
+    }
+
+    /**
+     * Sitedeki arama kutusunu bulup anahtar kelimeyi aratır
+     */
+    async performSmartSearch(keyword) {
+        try {
+            const searchSelectors = [
+                'input[type="search"]',
+                'input[name="q"]',
+                'input[name="query"]',
+                'input[name="search"]',
+                'input[placeholder*="ara" i]',
+                'input[placeholder*="search" i]',
+                '#search',
+                '.search-input',
+                '.search-bar input'
+            ];
+
+            for (const selector of searchSelectors) {
+                try {
+                    const elements = await this.driver.findElements(By.css(selector));
+                    for (const el of elements) {
+                        if (await el.isDisplayed()) {
+                            await el.click();
+                            await el.clear();
+                            await el.sendKeys(keyword, Key.RETURN);
+                            return true;
+                        }
+                    }
+                } catch (e) { }
+            }
+            return false;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    /**
+     * Sayfalandırma butonlarını bulup sonraki sayfalara geçer
+     */
+    async handlePagination(keyword, baseUrl) {
+        const pResults = [];
+        let currentPage = 1;
+        const maxPages = 3; // Şimdilik 3 sayfa ile sınırlı
+
+        while (currentPage < maxPages && !this.aborted) {
+            try {
+                // Yaygın "Sonraki" butonu desenleri
+                const nextXPaths = [
+                    "//a[contains(@rel, 'next')]",
+                    "//a[contains(text(), 'Sonraki')]",
+                    "//a[contains(text(), 'Next')]",
+                    "//button[contains(text(), 'Sonraki')]",
+                    "//a[contains(., '>')]",
+                    "//span[contains(text(), 'Sonraki')]/.."
+                ];
+
+                let nextBtn = null;
+                for (const xpath of nextXPaths) {
+                    try {
+                        const elements = await this.driver.findElements(By.xpath(xpath));
+                        for (const el of elements) {
+                            if (await el.isDisplayed() && await el.isEnabled()) {
+                                nextBtn = el;
+                                break;
+                            }
+                        }
+                        if (nextBtn) break;
+                    } catch (e) { }
+                }
+
+                if (nextBtn) {
+                    await nextBtn.click();
+                    await sleep(3000); // Yüklenme payı
+                    await this.scrollPage();
+                    const pageSource = await this.driver.getPageSource();
+                    const results = Parser.parse(pageSource, keyword, baseUrl);
+                    pResults.push(...results);
+                    currentPage++;
+                } else {
+                    break;
+                }
+            } catch (err) {
+                break;
+            }
+        }
+        return pResults;
     }
 
     /**
