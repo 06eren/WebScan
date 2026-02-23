@@ -231,6 +231,10 @@ class ScanEngine {
      */
     async performSmartSearch(keyword) {
         try {
+            // Önce engelleyici öğeleri temizle
+            await this.hideOverlays();
+            await sleep(1000);
+
             const searchSelectors = [
                 'input[type="search"]',
                 'input[name="q"]',
@@ -238,9 +242,11 @@ class ScanEngine {
                 'input[name="search"]',
                 'input[placeholder*="ara" i]',
                 'input[placeholder*="search" i]',
+                'input[aria-label*="ara" i]',
+                'input[aria-label*="search" i]',
                 '#search',
                 '.search-input',
-                '.search-bar input'
+                'input.search'
             ];
 
             for (const selector of searchSelectors) {
@@ -248,8 +254,16 @@ class ScanEngine {
                     const elements = await this.driver.findElements(By.css(selector));
                     for (const el of elements) {
                         if (await el.isDisplayed()) {
-                            await el.click();
-                            await el.clear();
+                            // Elementi görünür alana getir ve odağı zorla
+                            await this.driver.executeScript("arguments[0].scrollIntoView({block: 'center'}); arguments[0].focus();", el);
+                            await sleep(500);
+
+                            await el.click().catch(async () => {
+                                // Normal tıklama başarısız olursa JS ile tıkla
+                                await this.driver.executeScript("arguments[0].click();", el);
+                            });
+
+                            await el.clear().catch(() => { });
                             await el.sendKeys(keyword, Key.RETURN);
                             return true;
                         }
@@ -258,7 +272,48 @@ class ScanEngine {
             }
             return false;
         } catch (err) {
+            console.warn('Smart Search hatası:', err.message);
             return false;
+        }
+    }
+
+    /**
+     * Sayfadaki çerez bannerları, modal ve overlay'leri temizler
+     */
+    async hideOverlays() {
+        try {
+            await this.driver.executeScript(`
+                const selectors = [
+                    '[id*="cookie" i]', '[class*="cookie" i]', 
+                    '[id*="consent" i]', '[class*="consent" i]',
+                    '[id*="modal" i]', '[class*="modal" i]',
+                    '.banner', '.overlay', '.popup',
+                    '#onetrust-consent-sdk', '#gdpr-banner'
+                ];
+                
+                selectors.forEach(selector => {
+                    try {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            if (el.innerText.toLowerCase().includes('kabul') || 
+                                el.innerText.toLowerCase().includes('accept') ||
+                                el.innerText.toLowerCase().includes('anladım') ||
+                                el.style.position === 'fixed') {
+                                el.style.display = 'none';
+                                el.style.visibility = 'hidden';
+                                el.style.opacity = '0';
+                                el.style.pointerEvents = 'none';
+                            }
+                        });
+                    } catch(e) {}
+                });
+                
+                // Body overflow fix
+                document.body.style.overflow = 'auto';
+                document.documentElement.style.overflow = 'auto';
+            `);
+        } catch (err) {
+            console.warn('Overlay temizleme hatası:', err.message);
         }
     }
 
@@ -351,6 +406,19 @@ class ScanEngine {
                 await this.driver.get(normalizedUrl);
                 await this.driver.wait(until.elementLocated(By.css('body')), 10000);
                 await sleep(1500);
+
+                // Eğer ana sayfadaysak bir kez Smart Search dene
+                if (depth === 0) {
+                    const searchPerformed = await this.performSmartSearch(keyword);
+                    if (searchPerformed) {
+                        this.emitProgress({
+                            type: 'info',
+                            message: `Derin tarama başlangıcında otomatik arama yapıldı: ${keyword}`
+                        });
+                        await sleep(4000);
+                    }
+                }
+
                 await this.scrollPage();
 
                 const pageSource = await this.driver.getPageSource();

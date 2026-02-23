@@ -1,6 +1,6 @@
 {
   "name": "webscan",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Akıllı Web Tarama ve İzleme Uygulaması - Selenium ile çoklu site tarama",
   "main": "main.js",
   "scripts": {
